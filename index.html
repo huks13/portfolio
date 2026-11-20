@@ -72,7 +72,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
 <header>
   <h1 class="name">박해준</h1>
   <p class="role">자동화 분야 신입 지원</p>
-  <p class="intro">교육 과정에서 직접 해 본 실습과 프로젝트를 모았습니다.</p>
+  <p class="intro">교육 과정에서 직접 해 본 실습과 프로젝트 모음</p>
   <span class="contact">huks1357@gmail.com</span>
 </header>
 
@@ -91,20 +91,35 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
     <dl class="facts">
       <dt>인원</dt><dd>6명</dd>
       <dt>담당</dt><dd>카메라 인식 결과를 받아 주차·입출차 기록을 관리하는 서버(FastAPI·SQLite), 학습용 차량 사진 촬영</dd>
-      <dt>방식</dt><dd>코드는 AI 코딩 도구로 작성하고, 어떻게 동작해야 하는지 정하고 시험해 확인하는 일을 맡음</dd>
+      <dt>방식</dt><dd>코드는 AI 코딩 도구로 작성, 동작 조건 정리와 시험·확인 담당</dd>
     </dl>
-    <p>운전자는 빈자리와 내 차 위치, 요금을 궁금해하고, 관리자는 여러 주차장의 상황을 한눈에 보고 싶어 합니다. 이 질문들에 한 번에 답하려고, 카메라로 미니어처 주차장을 찍어 빈자리, 차가 서 있는 칸, 주차 요금을 보여 주는 시스템을 만들었습니다. 직접 만든 주차장 2곳(28칸)과 화면 속 가상 주차장 2곳(128칸)을 서버 하나로 관리했습니다. 저는 카메라가 보낸 인식 결과를 받아, 어느 칸에 어떤 차가 언제 들어오고 나갔는지 최종 기록하는 서버를 맡았습니다.</p>
+    <p>운전자가 주차장에서 궁금해하는 빈자리, 내 차 위치, 요금을 한 화면에서 보여 주고, 관리자는 여러 주차장을 한 번에 볼 수 있게 하자는 게 출발이었다. 카메라로 미니어처 주차장을 찍어 칸마다 어떤 차가 있는지 확인하고, 실물 주차장 2곳(28칸)과 가상 주차장 2곳(128칸)을 서버 하나로 묶었다. 나는 카메라가 보내는 인식 결과를 받아 어느 칸에 어떤 차가 언제 들어오고 나갔는지 기록하는 서버를 맡았다.</p>
     <figure class="diagram">
       <img src="media/system_diagram.svg" alt="카메라 PC에서 FastAPI 서버로 관측을 보내고, 서버가 사용자 웹·관리자 관제·챗봇에 데이터를 주는 구성도" width="1000" height="380">
-      <figcaption>시스템 구성도. 주황색 표시가 담당한 서버 영역입니다.</figcaption>
+      <figcaption>시스템 구성도 (주황색 표시가 담당 영역)</figcaption>
     </figure>
     <h3>맡아서 고친 부분</h3>
+    <p><b>1. 실물 카메라 연결 후 반복된 오류</b></p>
     <ul>
-      <li>차를 옆 칸으로 옮기거나 두 차의 자리를 바꾸면, 서버에 남아 있던 기록과 카메라가 새로 읽은 번호가 맞지 않아 오류가 계속 났습니다. 그래서 도착한 칸에 같은 번호가 계속 보이고 원래 칸이 비면 '차가 옮겨 간 것'으로 보고, 입차 시각과 요금을 그대로 이어 가도록 팀원과 함께 규칙을 정해 반영했습니다.</li>
-      <li>번호판을 바로 읽지 못한 차는 번호 없이 기록이 시작됐습니다. 나중에 같은 번호가 짧은 시간 안에 여러 번 확실하게 읽힐 때만 그 기록에 번호를 붙이도록 조건을 정리했고, 팀장 승인을 받아 반영했습니다.</li>
-      <li>잘못된 데이터 하나 때문에 카메라 결과를 받는 일 전체가 멈추던 부분을, 다시 시도해도 안 되는 데이터만 따로 빼 두고 나머지는 계속 받도록 고쳤습니다.</li>
+      <li>문제: 차를 옆 칸으로 옮기거나 두 차 자리를 바꾸면 서버 기록과 카메라가 읽은 번호가 어긋나 오류 발생</li>
+      <li>조치: 도착 칸에 같은 번호가 이어서 보이고 원래 칸이 비면 이동으로 처리, 입차 시각과 요금은 그대로 유지 (팀원과 규칙 협의 후 반영)</li>
+      <li>확인: 실물 주차장에서 자리 바꾸기·빈칸 이동 시험, 오류 없음</li>
     </ul>
-    <p>팀 통합 시험에서 카메라가 30분 동안 보낸 인식 결과 82,849건을 서버가 빠짐없이 받았습니다. 실물 주차장에서 차 8대와 11대를 이리저리 옮기는 시험에서도 주차 기록이 끊기지 않았습니다.</p>
+    <p><b>2. 번호를 늦게 읽은 차의 기록</b></p>
+    <ul>
+      <li>문제: 번호판을 바로 못 읽은 차는 번호 없이 기록 시작</li>
+      <li>조치: 같은 번호가 짧은 시간 안에 여러 번 확실히 읽힐 때만 기록에 번호 연결 (팀장 승인 후 반영)</li>
+    </ul>
+    <p><b>3. 오류 하나로 수신 전체 정지</b></p>
+    <ul>
+      <li>문제: 잘못된 데이터 하나에 카메라 데이터 수신 전체가 멈춤</li>
+      <li>조치: 다시 보내도 안 되는 데이터만 따로 분리, 나머지는 계속 수신</li>
+    </ul>
+    <h3>결과 (팀 통합 시험)</h3>
+    <ul>
+      <li>30분 동안 카메라가 보낸 인식 결과 82,849건 전부 수신</li>
+      <li>실물 주차장 차량 8대·11대 이동 시험에서 주차 기록 유지</li>
+    </ul>
     <figure>
       <img src="media/parking_capture.jpg" alt="RealSense 카메라를 삼각대에 달아 미니어처 주차장을 촬영하는 모습과 모니터의 촬영 프로그램 화면" width="1200" height="1600" loading="lazy">
       <figcaption>AI 학습용 차량 사진을 찍는 장면 (RealSense D435 카메라)</figcaption>
@@ -119,13 +134,20 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
       <dt>담당</dt><dd>Factory I/O 가상 공정 구성, PLC 연동</dd>
       <dt>사용</dt><dd>GX Works2, MX OPC Server, Factory I/O</dd>
     </dl>
-    <p>배터리 셀이 들어와 식별, 측정, A/B/C 등급 분류를 거쳐 박스에 담기기까지의 라인을 Factory I/O 가상 공정으로 만들고 PLC로 제어하는 프로젝트입니다. 측정 한 번에 약 10초가 걸려 셀이 밀리는 문제를 줄이려고, 측정 장비를 3대로 나눠 동시에 돌리는 구성으로 진행하고 있습니다. 결과는 프로젝트가 끝난 뒤 정리할 예정입니다.</p>
+    <ul>
+      <li>배터리 셀 입고 → 식별 → 측정 → A/B/C 등급 분류 → 박스 패킹 라인을 Factory I/O 가상 공정으로 구성하고 PLC로 제어</li>
+      <li>측정 1회에 약 10초가 걸려 셀이 밀리는 문제를 줄이기 위해 측정 장비 3대 병렬 구성으로 진행 중</li>
+      <li>결과는 프로젝트 종료 후 정리 예정</li>
+    </ul>
   </div>
 
   <div class="item">
     <span class="tag">팀 프로젝트 · 설계 단계</span>
     <h3>배터리팩 조립·검사 자동화 공정 (가칭)</h3>
-    <p>18650 배터리 4셀을 조립하고 전압을 검사하는 공정을 설계하고 있습니다. PLC와 Indy7 협동로봇을 연동하는 방향으로 검토 중입니다.</p>
+    <ul>
+      <li>18650 셀 4개 조립과 전압 검사 공정 설계 중</li>
+      <li>PLC와 Indy7 협동로봇 연동 방향 검토</li>
+    </ul>
   </div>
 </section>
 
@@ -136,7 +158,11 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <div class="item">
     <span class="tag">PLC · 서보</span>
     <h3>서보모터 위치결정 제어</h3>
-    <p>버튼을 누르면 서보모터가 기준 위치(원점)로 돌아가고, 다른 버튼으로 미리 정해 둔 두 위치까지 정확히 이동하도록 래더를 작성했습니다. 이동할 위치 값을 위치결정 모듈에 넣고 출발 신호를 주는 방식이며, 서보앰프는 MR-J4를 사용했습니다.</p>
+    <ul>
+      <li>버튼 입력으로 원점 복귀, 미리 정한 두 위치로 이동하는 래더 작성</li>
+      <li>이동할 위치 값을 위치결정 모듈에 넣고 출발 신호를 주는 방식</li>
+      <li>서보앰프 MR-J4 사용</li>
+    </ul>
     <figure class="diagram">
       <img src="media/ladder_v.svg" alt="GX Works2 래더 프로그램. 원점 복귀, 위치 100000과 200000 이동, 기동 신호 회로" width="776" height="1024" loading="lazy">
       <figcaption>직접 작성한 GX Works2 래더</figcaption>
@@ -146,7 +172,11 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <div class="item">
     <span class="tag">PLC · 교육 평가 과제</span>
     <h3>PLC 공정 순서 제어</h3>
-    <p>공급, 드릴 가공, 송출, 배출 순서로 움직이는 실습 장비의 래더를 작성했습니다. 센서로 실린더가 끝까지 움직였는지 확인한 뒤에만 다음 단계로 넘어가게 했고, 드릴 가공은 타이머로 2초 동안 하도록 했습니다. 초기화 버튼을 누르면 실린더가 모두 처음 위치로 돌아갑니다.</p>
+    <ul>
+      <li>공급 → 드릴 가공 → 송출 → 배출 순서로 움직이는 실습 장비의 래더 작성</li>
+      <li>센서로 실린더가 끝까지 움직였는지 확인한 뒤 다음 단계로 진행</li>
+      <li>드릴 가공은 타이머로 2초, 초기화 버튼으로 실린더 전체 원위치</li>
+    </ul>
     <figure class="diagram">
       <img src="media/ladder_hmi_main.svg" alt="GX Works2 래더. 시작 스위치 자기유지, 단계별 SET, 드릴 타이머 2초, 초기화 일괄 리셋" width="367" height="1304" loading="lazy">
       <figcaption>직접 작성한 공정 순서 래더 (위: 단계 진행, 아래: 실린더·램프 출력)</figcaption>
@@ -156,7 +186,11 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <div class="item">
     <span class="tag">로봇 · PLC · Python</span>
     <h3>Indy7 협동로봇 픽앤플레이스</h3>
-    <p>Indy7로 부품을 집어 지정 위치에 놓는 픽앤플레이스를 실습했습니다. 작업판의 칸 번호를 로봇이 갈 좌표로 바꾸고, 주변과 부딪히지 않도록 작업 위치 바로 위의 안전한 높이를 거쳐 내려가고 올라오게 했습니다. PLC 버튼을 누르면 Python 프로그램이 신호를 읽어 로봇 작업을 시작하는 연동도 실습했습니다.</p>
+    <ul>
+      <li>Indy7로 부품을 집어 지정 위치에 놓는 픽앤플레이스 실습</li>
+      <li>작업판 칸 번호를 로봇 좌표로 변환, 작업 위치 바로 위 안전 높이를 거쳐 진입·복귀</li>
+      <li>PLC 버튼 신호를 Python 프로그램이 읽어 로봇 작업을 시작하는 연동 실습</li>
+    </ul>
     <figure>
       <video src="media/robot_indy7.mp4" poster="media/robot_indy7_poster.jpg" controls playsinline muted preload="metadata"></video>
       <figcaption>Indy7이 공급부의 부품을 집어 트레이에 옮기는 장면</figcaption>
@@ -166,13 +200,20 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <div class="item">
     <span class="tag">시뮬레이션</span>
     <h3>Factory I/O 비전 분류</h3>
-    <p>Factory I/O 가상 공장에서 컨베이어로 오는 물체를 비전 센서가 초록·파랑·금속으로 구분하면, 알맞은 푸셔가 밀어내 분류하도록 래더를 작성했습니다. 푸셔가 끝까지 나갔다가 돌아왔는지 센서로 확인한 뒤 다음 물체를 받도록 했습니다. PLC와 Factory I/O는 OPC로 연결했습니다.</p>
+    <ul>
+      <li>컨베이어로 오는 물체를 비전 센서가 초록·파랑·금속으로 구분하면 해당 푸셔가 밀어내 분류하는 래더 작성</li>
+      <li>푸셔가 끝까지 나갔다 돌아왔는지 센서로 확인한 뒤 다음 물체 처리</li>
+      <li>PLC와 Factory I/O는 OPC로 연결</li>
+    </ul>
   </div>
 
   <div class="item">
     <span class="tag">공유압</span>
     <h3>전기공압 · 전기유압 회로</h3>
-    <p>릴레이와 솔레노이드 밸브를 전선으로 배선하고 실린더까지 공기·유압 호스를 연결해 회로를 만든 뒤, 실린더가 제대로 움직이는지 확인했습니다.</p>
+    <ul>
+      <li>릴레이와 솔레노이드 밸브 배선, 실린더까지 공기·유압 호스 연결</li>
+      <li>회로 구성 후 실린더 동작 확인</li>
+    </ul>
     <figure>
       <img src="media/pneumatic_trainer.jpg" alt="전기공압 실습 장치. 릴레이 모듈과 실린더, 밸브가 배선·배관된 모습" width="1600" height="1200" loading="lazy">
       <figcaption>전기공압 실습 장치 배선·배관</figcaption>
@@ -195,7 +236,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <h2><span class="no">03</span>자격 준비: 전기기능사</h2>
   <div class="item">
     <span class="tag">필기 합격 · 실기 응시 2026.11.24</span>
-    <p>실기 시험에 대비해, 회로 도면을 보고 제어함 안의 부품을 배선하고 배관까지 마치는 작업을 반복해서 연습했습니다.</p>
+    <ul>
+      <li>실기 대비로 회로 도면을 보고 제어함 부품 배선부터 배관까지 반복 연습</li>
+    </ul>
     <div class="pair">
       <figure>
         <img src="media/wiring_board1.jpg" alt="완성한 제어함과 배관·배선 작업판" width="1200" height="1600" loading="lazy">
@@ -229,7 +272,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
       </tbody>
     </table>
   </div>
-  <p class="intro">모두 교육 과정에서 익힌 기초 수준입니다.</p>
+  <p class="intro">모두 교육 과정에서 익힌 기초 수준</p>
 </section>
 
 <footer>박해준 · 자동화 포트폴리오 · 2026.11</footer>
